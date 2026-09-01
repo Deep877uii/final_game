@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  --font-display: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+
+  /* We define the raw palette here so Tailwind generates the utilities for them */
+  --color-slate-950: #020617;
+  --color-slate-900: #0f172a;
+  --color-slate-800: #1e293b;
+  --color-slate-700: #334155;
+  --color-slate-600: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-400: #94a3b8;
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0;
+  --color-slate-100: #f1f5f9;
+  --color-slate-50: #f8fafc;
+
+  /* BI Color Palette (Vibrant, distinct colors for charts) */
+  --color-bi-blue: #0078D4;
+  --color-bi-green: #107C41;
+  --color-bi-yellow: #FFB900;
+  --color-bi-orange: #D83B01;
+  --color-bi-purple: #5C2D91;
+  --color-bi-cyan: #00B7C3;
+}
+
+:root {
+  /* LIGHT MODE (Default Power BI Style) */
+  --bg-app: #F3F2F1; /* Classic BI light gray background */
+  --bg-surface: #FFFFFF;
+  --bg-surface-hover: #F8F8F8;
+  --bg-surface-raised: #FFFFFF;
+  
+  --border-subtle: #EDEBE9;
+  --border-strong: #C8C6C4;
+  
+  --text-primary: #201F1E;
+  --text-secondary: #605E5C;
+  --text-tertiary: #A19F9D;
+  
+  --shadow-widget: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+  --shadow-dropdown: 0 3.2px 7.2px 0 rgba(0,0,0,0.132), 0 0.6px 1.8px 0 rgba(0,0,0,0.108);
+  
+  --color-primary: var(--color-bi-blue);
+  --color-primary-hover: #005A9E;
+  --color-primary-bg: rgba(0, 120, 212, 0.1);
+  
+  --color-success: var(--color-bi-green);
+  --color-success-bg: rgba(16, 124, 65, 0.1);
+  --color-warning: var(--color-bi-yellow);
+  --color-warning-bg: rgba(255, 185, 0, 0.1);
+  --color-danger: var(--color-bi-orange);
+  --color-danger-bg: rgba(216, 59, 1, 0.1);
+}
+
+.dark {
+  /* DARK MODE (Power BI Dark Theme Style) */
+  --bg-app: #111111;
+  --bg-surface: #1E1E1E;
+  --bg-surface-hover: #2D2D2D;
+  --bg-surface-raised: #252525;
+  
+  --border-subtle: #333333;
+  --border-strong: #444444;
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #C8C8C8;
+  --text-tertiary: #A0A0A0;
+  
+  --shadow-widget: 0 1.6px 3.6px 0 rgba(0,0,0,0.4), 0 0.3px 0.9px 0 rgba(0,0,0,0.3);
+  --shadow-dropdown: 0 3.2px 7.2px 0 rgba(0,0,0,0.5), 0 0.6px 1.8px 0 rgba(0,0,0,0.4);
+  
+  --color-primary: #479EF5; /* Lighter blue for dark mode */
+  --color-primary-hover: #6CB8F6;
+  --color-primary-bg: rgba(71, 158, 245, 0.15);
+  
+  --color-success: #42D87B;
+  --color-success-bg: rgba(66, 216, 123, 0.15);
+  --color-warning: #FFD335;
+  --color-warning-bg: rgba(255, 211, 53, 0.15);
+  --color-danger: #F86E46;
+  --color-danger-bg: rgba(248, 110, 70, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ──── Utility Classes for BI Style ──── */
+
+.bi-widget {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  box-shadow: var(--shadow-widget);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bi-widget-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.bi-widget-body {
+  padding: 16px;
+}
+
+.bi-input {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.bi-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.bi-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.bi-button {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 2px;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+
+.bi-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.bi-button-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.bi-button-secondary:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.bi-table-header {
+  background-color: var(--bg-surface-hover);
+  border-bottom: 2px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bi-table-row {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 0.15s ease;
+}
+
+.bi-table-row:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+/* ──── Scrollbar ──── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* ──── Animations ──── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes shimmerBI {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-hover) 25%,
+    var(--border-subtle) 50%,
+    var(--bg-surface-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerBI 1.5s infinite;
+  border-radius: 2px;
+}
