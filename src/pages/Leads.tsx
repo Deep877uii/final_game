@@ -144,16 +144,6 @@ export default function Leads() {
     );
   }, [leads, selectedLeadIds]);
 
-  const activeWorkspaceLead = useMemo(() => {
-    if (!activeWorkspaceLeadId) return filteredLeads[0] || null;
-    return (
-      leads.find(
-        (l) => (l.leadId || l.postUrl || l.name) === activeWorkspaceLeadId
-      ) ||
-      filteredLeads[0] ||
-      null
-    );
-  }, [activeWorkspaceLeadId, leads, filteredLeads]);
 
   const handleBulkGenerate = async (leadsToGenerate: Lead[] = selectedLeads) => {
     setIsBulkGenerating(true);

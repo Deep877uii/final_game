@@ -17,11 +17,10 @@ import { useApp } from '../context/AppContext';
 import DashboardStats from '../components/DashboardStats';
 import LeadDetails from '../components/LeadDetails';
 import EmailComposer from '../components/EmailComposer';
-import EmptyState from '../components/EmptyState';
 import type { Lead } from '../types/lead';
 
 export default function Dashboard() {
-  const { leads, leadsLoading, emailDraft, theme } = useApp();
+  const { leads, emailDraft, theme } = useApp();
   const navigate = useNavigate();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [composerLead, setComposerLead] = useState<Lead | null>(null);

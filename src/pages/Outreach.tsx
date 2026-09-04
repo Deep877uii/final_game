@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Search, Send, Sparkles, LayoutGrid, List, Loader2 } from 'lucide-react';
+import { Search, Send, Sparkles, LayoutGrid, List, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import LeadCard from '../components/LeadCard';
 import LeadTable from '../components/LeadTable';
@@ -15,8 +15,6 @@ export default function Outreach() {
   const {
     leads,
     leadsLoading,
-    emailsGenerated,
-    emailsSent,
     selectedLead,
     setSelectedLead,
     emailDraft,

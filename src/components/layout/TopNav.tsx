@@ -1,4 +1,4 @@
-import { Menu, Search, Bell, Sun, Moon, ChevronDown } from 'lucide-react';
+import { Menu, Bell, Sun, Moon } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 interface TopNavProps {
