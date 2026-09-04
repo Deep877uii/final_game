@@ -38,7 +38,7 @@ export default function Leads() {
     setShowEmailComposer,
     selectedLeadIds,
     clearSelection,
-    activeWorkspaceLeadId,
+
     setActiveWorkspaceLeadId,
     filterOptions,
     generateBulkEmails,
