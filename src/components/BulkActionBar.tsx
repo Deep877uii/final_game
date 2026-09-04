@@ -20,7 +20,6 @@ export default function BulkActionBar({
   const count = selectedLeads.length;
   if (count === 0 && !bulkProgress?.active) return null;
 
-  // Count how many of the selected leads already have generated emails ready to send
   const readyToSendCount = selectedLeads.filter((lead) => {
     const leadKey = lead.leadId || lead.postUrl || lead.name;
     const draft = generatedEmails[leadKey];
@@ -28,32 +27,32 @@ export default function BulkActionBar({
   }).length;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-2xl w-[92%] sm:w-auto shadow-[var(--shadow-dropdown)]">
-      <div className="bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-sm p-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
-        {/* Selection Count & Status */}
-        <div className="flex items-center gap-3 px-2">
-          <div className="w-6 h-6 rounded-sm bg-[var(--color-primary-bg)] text-[var(--color-primary)] font-bold flex items-center justify-center text-xs tabular-nums">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-2xl w-[92%] sm:w-auto">
+      <div className="bg-[#eff8df] dark:bg-[rgba(223,244,90,.1)] border border-[var(--accent-soft)] rounded-xl p-3.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 shadow-lg">
+        {/* Selection Count */}
+        <div className="flex items-center gap-3 px-1">
+          <div className="w-6 h-6 rounded-lg bg-[var(--accent)] text-[var(--accent-deep)] font-bold flex items-center justify-center text-xs">
             {count}
           </div>
-          <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] whitespace-nowrap">
+          <span className="text-sm font-bold text-[var(--accent-deep)] dark:text-[var(--accent)] whitespace-nowrap">
             {count} lead{count !== 1 ? 's' : ''} selected
           </span>
         </div>
 
-        {/* Progress Display */}
+        {/* Progress */}
         {bulkProgress?.active && (
-          <div className="flex items-center gap-2 px-3 py-1 rounded-sm bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] text-xs">
-            <div className="w-3.5 h-3.5 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin flex-shrink-0" />
-            <span className="text-[var(--text-secondary)] font-medium">
-              {bulkProgress.type === 'generate' ? 'Generating' : 'Sending'} {bulkProgress.current}/{bulkProgress.total}...
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/50 dark:bg-white/5 text-xs">
+            <div className="w-3.5 h-3.5 border-2 border-[var(--accent-mid)] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+            <span className="text-[var(--accent-deep)] dark:text-[var(--text-secondary)] font-medium">
+              {bulkProgress.type === 'generate' ? 'Generating' : 'Sending'} {bulkProgress.current}/{bulkProgress.total}
             </span>
             {bulkProgress.completed > 0 && (
-              <span className="text-[var(--color-success)] flex items-center gap-1 font-semibold">
+              <span className="text-[var(--color-success)] flex items-center gap-1 font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" /> {bulkProgress.completed}
               </span>
             )}
             {bulkProgress.failed > 0 && (
-              <span className="text-[var(--color-danger)] flex items-center gap-1 font-semibold">
+              <span className="text-[var(--color-danger)] flex items-center gap-1 font-bold">
                 <AlertCircle className="w-3.5 h-3.5" /> {bulkProgress.failed}
               </span>
             )}
@@ -66,10 +65,10 @@ export default function BulkActionBar({
             type="button"
             onClick={onGenerateAll}
             disabled={bulkProgress?.inProgress}
-            className="flex-1 sm:flex-none bi-button px-3.5 py-1.5 flex items-center justify-center gap-1.5 text-xs disabled:opacity-50"
+            className="flex-1 sm:flex-none lime-button px-3.5 py-2 flex items-center justify-center gap-1.5 text-xs disabled:opacity-50"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Generate All Emails</span>
+            Generate All
           </button>
 
           <button
@@ -78,21 +77,19 @@ export default function BulkActionBar({
             disabled={readyToSendCount === 0 || bulkProgress?.inProgress}
             title={
               readyToSendCount === 0
-                ? 'Generate emails for selected leads first before sending'
-                : `Send ${readyToSendCount} generated email(s)`
+                ? 'Generate emails first'
+                : `Send ${readyToSendCount} email(s)`
             }
-            className="flex-1 sm:flex-none bi-button !bg-[var(--color-success)] hover:!bg-[#0D6535] px-3.5 py-1.5 flex items-center justify-center gap-1.5 text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-none soft-button px-3.5 py-2 flex items-center justify-center gap-1.5 text-xs font-bold text-[var(--color-success)] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Send className="w-3.5 h-3.5" />
-            <span>
-              Send All {readyToSendCount > 0 ? `(${readyToSendCount})` : ''}
-            </span>
+            Send All {readyToSendCount > 0 ? `(${readyToSendCount})` : ''}
           </button>
 
           <button
             type="button"
             onClick={onClear}
-            className="p-1.5 rounded-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors ml-1"
+            className="p-2 rounded-lg text-[var(--accent-deep)] dark:text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
             aria-label="Clear selection"
           >
             <X className="w-4 h-4" />

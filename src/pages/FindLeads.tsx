@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Sparkles, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SearchForm from '../components/SearchForm';
 import ScrapingProgress from '../components/ScrapingProgress';
@@ -12,14 +12,12 @@ export default function FindLeads() {
   const navigate = useNavigate();
   const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Clean up polling on unmount
   useEffect(() => {
     return () => {
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     };
   }, []);
 
-  // Poll for new leads after async scraper trigger
   const startPolling = useCallback(() => {
     if (pollTimerRef.current) clearInterval(pollTimerRef.current);
     let polls = 0;
@@ -94,46 +92,46 @@ export default function FindLeads() {
   };
 
   return (
-    <div className="space-y-6 max-w-3xl animate-fadeIn">
+    <div className="space-y-6 max-w-5xl mx-auto pt-3 animate-fadeUp">
       {/* Header */}
-      <div>
-        <div className="flex items-center gap-3 mb-1.5">
-          <div className="w-10 h-10 rounded-sm bg-[var(--color-primary)] flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-              Find New Leads
-            </h1>
-            <p className="text-xs text-[var(--text-secondary)]">
-              Discover hiring opportunities and turn them into qualified outreach prospects.
-            </p>
-          </div>
-        </div>
+      <div className="text-center mb-8">
+        <p className="text-xs font-bold uppercase tracking-[.17em] text-[var(--text-secondary)] mb-3">
+          AI-Powered Discovery
+        </p>
+        <h1 className="text-3xl font-bold tracking-[-.055em] m-0 text-[var(--text-primary)]">
+          Find New Leads
+        </h1>
+        <p className="text-sm text-[var(--text-secondary)] mt-3 max-w-md mx-auto">
+          Discover hiring opportunities and turn them into qualified outreach prospects with AI.
+        </p>
       </div>
 
       {/* Search Form */}
       <SearchForm onSubmit={handleSearch} isLoading={scraping} />
 
       {/* Scraping Progress */}
-      <ScrapingProgress isActive={scraping} />
+      {scraping && (
+        <div className="mt-8">
+          <ScrapingProgress isActive={scraping} />
+        </div>
+      )}
 
       {/* Result Card */}
       {result && !scraping && (
         <div
-          className={`bi-widget p-5 sm:p-6 flex items-start justify-between gap-4 border-l-4 ${
+          className={`surface p-5 flex items-start justify-between gap-4 rounded-xl ${
             result.success
-              ? 'border-l-[var(--color-success)]'
-              : 'border-l-[var(--color-danger)]'
+              ? 'border-l-4 border-l-[var(--color-success)]'
+              : 'border-l-4 border-l-[var(--color-danger)]'
           }`}
         >
           <div className="flex items-start gap-3">
             {result.success ? (
-              <div className="w-8 h-8 rounded-sm bg-[var(--color-success-bg)] flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-success-bg)] flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="w-4 h-4 text-[var(--color-success)]" />
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-sm bg-[var(--color-danger-bg)] flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-[var(--color-danger-bg)] flex items-center justify-center flex-shrink-0">
                 <AlertCircle className="w-4 h-4 text-[var(--color-danger)]" />
               </div>
             )}
@@ -157,9 +155,9 @@ export default function FindLeads() {
             <button
               type="button"
               onClick={() => navigate('/leads')}
-              className="bi-button flex items-center gap-1 px-3 py-1.5 flex-shrink-0 text-xs"
+              className="lime-button flex items-center gap-1.5 px-4 py-2 text-xs flex-shrink-0 rounded-xl"
             >
-              <span>View in Workspace</span>
+              <span>View Leads</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           )}

@@ -38,14 +38,14 @@ export default function LeadCard({ lead, onClick, compact }: LeadCardProps) {
     <button
       type="button"
       onClick={() => onClick?.(lead)}
-      className={`bi-widget w-full text-left ${
+      className={`surface w-full text-left ${
         compact ? 'p-3.5' : 'p-4'
-      } group cursor-pointer hover:border-[var(--color-primary)] hover:shadow-md`}
+      } group cursor-pointer hover:border-[var(--accent-soft)] hover:shadow-md transition-all duration-200`}
     >
       <div className="flex items-start gap-3.5">
         {/* Avatar */}
         <div
-          className={`flex-shrink-0 rounded-sm bg-[var(--color-primary)] flex items-center justify-center font-bold text-white ${
+          className={`flex-shrink-0 rounded-full bg-[#dce8dd] dark:bg-[#2a3530] flex items-center justify-center font-bold text-[#385342] dark:text-[#9bad9f] ${
             compact ? 'w-9 h-9 text-xs' : 'w-11 h-11 text-sm'
           }`}
         >
@@ -56,13 +56,13 @@ export default function LeadCard({ lead, onClick, compact }: LeadCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <h3
-              className={`font-semibold text-[var(--text-primary)] truncate leading-tight group-hover:text-[var(--color-primary)] transition-colors ${
+              className={`font-semibold text-[var(--text-primary)] truncate leading-tight group-hover:text-[var(--accent-mid)] transition-colors ${
                 compact ? 'text-xs' : 'text-sm'
               }`}
             >
               {lead.name}
             </h3>
-            <ChevronRight className="w-3.5 h-3.5 text-[var(--text-tertiary)] group-hover:text-[var(--color-primary)] flex-shrink-0 transition-all group-hover:translate-x-0.5" />
+            <ChevronRight className="w-3.5 h-3.5 text-[var(--text-tertiary)] group-hover:text-[var(--accent-mid)] flex-shrink-0 transition-all group-hover:translate-x-0.5" />
           </div>
 
           {lead.role && (
@@ -97,16 +97,16 @@ export default function LeadCard({ lead, onClick, compact }: LeadCardProps) {
           {!compact && (
             <div className="flex items-center gap-1.5 mt-2.5">
               {lead.email ? (
-                <span className="inline-flex items-center gap-1 bg-[var(--color-success-bg)] text-[var(--color-success)] px-2 py-0.5 rounded-sm text-[10px] font-semibold">
+                <span className="badge badge-emailed text-[10px] py-1 px-2">
                   <Mail className="w-3 h-3" /> Email
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 bg-[var(--bg-surface-hover)] text-[var(--text-secondary)] border border-[var(--border-strong)] px-2 py-0.5 rounded-sm text-[10px] font-semibold">
+                <span className="badge badge-new text-[10px] py-1 px-2">
                   <Mail className="w-3 h-3" /> No email
                 </span>
               )}
               {lead.linkedinUrl && (
-                <span className="inline-flex items-center gap-1 bg-[var(--color-primary-bg)] text-[var(--color-primary)] px-2 py-0.5 rounded-sm text-[10px] font-semibold">
+                <span className="badge badge-interested text-[10px] py-1 px-2">
                   <Link className="w-3 h-3" /> LinkedIn
                 </span>
               )}

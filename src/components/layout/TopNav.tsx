@@ -1,4 +1,4 @@
-import { Menu, BarChart3, Sun, Moon } from 'lucide-react';
+import { Menu, Search, Bell, Sun, Moon, ChevronDown } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 interface TopNavProps {
@@ -9,41 +9,43 @@ export default function TopNav({ onMenuClick }: TopNavProps) {
   const { theme, toggleTheme } = useApp();
 
   return (
-    <header className="sticky top-0 z-30 bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] shadow-[var(--shadow-widget)]">
-      <div className="flex items-center justify-between px-4 h-14">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onMenuClick}
-            className="p-1.5 -ml-1.5 rounded-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors lg:hidden"
-            aria-label="Open navigation menu"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+    <header className="sticky top-0 z-20 h-[76px] flex items-center justify-between px-6 md:px-10 w-full bg-[var(--bg-surface)] border-b border-[var(--border-subtle)] transition-all duration-300">
+      {/* Left: Search */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onMenuClick}
+          className="p-2 -ml-1 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors"
+          aria-label="Toggle navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
 
-          <div className="flex items-center gap-2 lg:hidden">
-            <div className="w-6 h-6 bg-[var(--color-primary)] flex items-center justify-center text-white">
-              <BarChart3 className="w-3.5 h-3.5" />
-            </div>
-            <span className="text-sm font-semibold text-[var(--text-primary)] tracking-tight">
-              LeadGen
-            </span>
-          </div>
-        </div>
 
-        {/* Global Header Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleTheme}
-            className="p-1.5 rounded-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)] transition-colors flex items-center gap-2"
-            title="Toggle theme"
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-5 h-5" />
-            ) : (
-              <Moon className="w-5 h-5" />
-            )}
-          </button>
-        </div>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-3 ml-auto">
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="soft-button h-10 w-10 rounded-xl grid place-items-center"
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+          ) : (
+            <Moon className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+          )}
+        </button>
+
+        {/* Notifications */}
+        <button
+          className="soft-button h-10 w-10 rounded-xl grid place-items-center relative"
+          aria-label="Notifications"
+        >
+          <Bell className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+          <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[var(--accent-soft)]" />
+        </button>
       </div>
     </header>
   );

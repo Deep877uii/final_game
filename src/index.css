@@ -1,235 +1,343 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
-  --font-display: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-
-  /* We define the raw palette here so Tailwind generates the utilities for them */
-  --color-slate-950: #020617;
-  --color-slate-900: #0f172a;
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
-  --color-slate-600: #475569;
-  --color-slate-500: #64748b;
-  --color-slate-400: #94a3b8;
-  --color-slate-300: #cbd5e1;
-  --color-slate-200: #e2e8f0;
-  --color-slate-100: #f1f5f9;
-  --color-slate-50: #f8fafc;
-
-  /* BI Color Palette (Vibrant, distinct colors for charts) */
-  --color-bi-blue: #0078D4;
-  --color-bi-green: #107C41;
-  --color-bi-yellow: #FFB900;
-  --color-bi-orange: #D83B01;
-  --color-bi-purple: #5C2D91;
-  --color-bi-cyan: #00B7C3;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, "Courier New", monospace;
 }
 
+/* ══════════════════════════════════════════════
+   LeadForge Design System
+   ══════════════════════════════════════════════ */
+
 :root {
-  /* LIGHT MODE (Default Power BI Style) */
-  --bg-app: #F3F2F1; /* Classic BI light gray background */
-  --bg-surface: #FFFFFF;
-  --bg-surface-hover: #F8F8F8;
-  --bg-surface-raised: #FFFFFF;
-  
-  --border-subtle: #EDEBE9;
-  --border-strong: #C8C6C4;
-  
-  --text-primary: #201F1E;
-  --text-secondary: #605E5C;
-  --text-tertiary: #A19F9D;
-  
-  --shadow-widget: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
-  --shadow-dropdown: 0 3.2px 7.2px 0 rgba(0,0,0,0.132), 0 0.6px 1.8px 0 rgba(0,0,0,0.108);
-  
-  --color-primary: var(--color-bi-blue);
-  --color-primary-hover: #005A9E;
-  --color-primary-bg: rgba(0, 120, 212, 0.1);
-  
-  --color-success: var(--color-bi-green);
-  --color-success-bg: rgba(16, 124, 65, 0.1);
-  --color-warning: var(--color-bi-yellow);
-  --color-warning-bg: rgba(255, 185, 0, 0.1);
-  --color-danger: var(--color-bi-orange);
-  --color-danger-bg: rgba(216, 59, 1, 0.1);
+  /* Core palette */
+  --ink: #17211d;
+  --muted: #66736c;
+  --line: #e6ebe7;
+  --canvas: #f7f8f6;
+  --surface: #ffffff;
+  --accent: #dff45a;
+  --accent-deep: #24410d;
+  --accent-mid: #648f1e;
+  --accent-soft: #a7cf49;
+  --green: #3d9c55;
+  --nav: #17211d;
+
+  /* Semantic */
+  --bg-app: var(--canvas);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: #f8faf7;
+  --bg-surface-raised: var(--surface);
+  --border-subtle: var(--line);
+  --border-strong: #cfd8d1;
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --text-tertiary: #9aa49e;
+  --shadow-widget: 0 1px 3px rgba(23,33,29,.06);
+  --shadow-dropdown: 0 8px 24px rgba(23,33,29,.1);
+
+  /* Status colors */
+  --color-primary: var(--accent-mid);
+  --color-primary-hover: #547a18;
+  --color-primary-bg: rgba(223,244,90,.12);
+  --color-success: #3d9c55;
+  --color-success-bg: #edf8f1;
+  --color-warning: #9a6815;
+  --color-warning-bg: #fff5dc;
+  --color-danger: #c44a2a;
+  --color-danger-bg: #fef2ef;
+  --color-info: #3966ae;
+  --color-info-bg: #eef4ff;
+  --color-purple: #7351a1;
+  --color-purple-bg: #f3edff;
 }
 
 .dark {
-  /* DARK MODE (Power BI Dark Theme Style) */
-  --bg-app: #111111;
-  --bg-surface: #1E1E1E;
-  --bg-surface-hover: #2D2D2D;
-  --bg-surface-raised: #252525;
-  
-  --border-subtle: #333333;
-  --border-strong: #444444;
-  
-  --text-primary: #FFFFFF;
-  --text-secondary: #C8C8C8;
-  --text-tertiary: #A0A0A0;
-  
-  --shadow-widget: 0 1.6px 3.6px 0 rgba(0,0,0,0.4), 0 0.3px 0.9px 0 rgba(0,0,0,0.3);
-  --shadow-dropdown: 0 3.2px 7.2px 0 rgba(0,0,0,0.5), 0 0.6px 1.8px 0 rgba(0,0,0,0.4);
-  
-  --color-primary: #479EF5; /* Lighter blue for dark mode */
-  --color-primary-hover: #6CB8F6;
-  --color-primary-bg: rgba(71, 158, 245, 0.15);
-  
-  --color-success: #42D87B;
-  --color-success-bg: rgba(66, 216, 123, 0.15);
-  --color-warning: #FFD335;
-  --color-warning-bg: rgba(255, 211, 53, 0.15);
-  --color-danger: #F86E46;
-  --color-danger-bg: rgba(248, 110, 70, 0.15);
+  --ink: #edf4ed;
+  --muted: #9bad9f;
+  --line: #2a3530;
+  --canvas: #0f1613;
+  --surface: #1a2320;
+  --nav: #0f1613;
+
+  --bg-app: var(--canvas);
+  --bg-surface: var(--surface);
+  --bg-surface-hover: #243029;
+  --bg-surface-raised: #1e2a26;
+  --border-subtle: var(--line);
+  --border-strong: #3a4840;
+  --text-primary: var(--ink);
+  --text-secondary: var(--muted);
+  --text-tertiary: #6b7c72;
+  --shadow-widget: 0 1px 3px rgba(0,0,0,.2);
+  --shadow-dropdown: 0 8px 24px rgba(0,0,0,.35);
+
+  --color-primary: #b9d654;
+  --color-primary-hover: #d2ec72;
+  --color-primary-bg: rgba(223,244,90,.1);
+  --color-success: #5cba72;
+  --color-success-bg: rgba(61,156,85,.15);
+  --color-warning: #d4a23e;
+  --color-warning-bg: rgba(154,104,21,.15);
+  --color-danger: #e06b4a;
+  --color-danger-bg: rgba(196,74,42,.15);
+  --color-info: #6b9ae0;
+  --color-info-bg: rgba(57,102,174,.15);
+  --color-purple: #a885d8;
+  --color-purple-bg: rgba(115,81,161,.15);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* ──── Reset ──── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-app);
+  background: var(--bg-app);
   color: var(--text-primary);
   min-height: 100vh;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color .2s ease, color .2s ease;
 }
 
-/* ──── Utility Classes for BI Style ──── */
+/* ══════════════════════════════════════════════
+   Component Classes
+   ══════════════════════════════════════════════ */
 
-.bi-widget {
-  background-color: var(--bg-surface);
+/* Surface card */
+.surface {
+  background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  border-radius: 10px;
   box-shadow: var(--shadow-widget);
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: background .2s, border-color .2s, box-shadow .2s, transform .2s;
 }
 
-.bi-widget-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border-subtle);
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: var(--text-primary);
+/* Metric card with decorative circle */
+.metric-card {
+  padding: 20px;
+  min-height: 128px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-dropdown);
+  border-color: var(--border-strong);
+}
+.metric-card::after {
+  content: "";
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  right: -28px;
+  bottom: -35px;
+  border-radius: 100%;
+  background: rgba(223,244,90,.25);
+}
+.metric-value {
+  letter-spacing: -.055em;
 }
 
-.bi-widget-body {
-  padding: 16px;
+/* Buttons */
+.soft-button {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.soft-button:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-surface-hover);
+  transform: translateY(-1px);
 }
 
-.bi-input {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-.bi-input::placeholder {
-  color: var(--text-tertiary);
-}
-
-.bi-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: inset 0 0 0 1px var(--color-primary);
-}
-
-.bi-button {
-  background-color: var(--color-primary);
-  color: #fff;
+.lime-button {
+  background: var(--accent);
+  color: var(--accent-deep);
   border: none;
-  border-radius: 2px;
-  font-weight: 600;
-  transition: background-color 0.15s ease;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 7px 16px rgba(114,143,24,.14);
+  transition: .18s ease;
+  font-weight: 700;
+}
+.lime-button:hover {
+  filter: brightness(.96);
+  transform: translateY(-1px);
+}
+.lime-button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.bi-button:hover {
-  background-color: var(--color-primary-hover);
+/* Status badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge::before {
+  content: "";
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.badge-new { background: var(--color-info-bg); color: var(--color-info); }
+.badge-generated { background: var(--color-warning-bg); color: var(--color-warning); }
+.badge-emailed { background: var(--color-success-bg); color: var(--color-success); }
+.badge-replied { background: var(--color-purple-bg); color: var(--color-purple); }
+.badge-interested { background: #e9f8d6; color: #557c19; }
+.dark .badge-interested { background: rgba(85,124,25,.15); }
+
+/* Table rows */
+.table-row {
+  transition: .15s ease;
+  cursor: pointer;
+}
+.table-row:hover {
+  background: var(--bg-surface-hover);
 }
 
-.bi-button-secondary {
-  background-color: transparent;
-  color: var(--text-primary);
-  border: 1px solid var(--border-strong);
-  border-radius: 2px;
-  font-weight: 600;
-  transition: all 0.15s ease;
-}
-
-.bi-button-secondary:hover {
-  background-color: var(--bg-surface-hover);
-}
-
-.bi-table-header {
-  background-color: var(--bg-surface-hover);
-  border-bottom: 2px solid var(--border-strong);
+/* Tabs */
+.tab-button {
   color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.tab-button:hover {
+  color: var(--text-primary);
+}
+.tab-button.active {
+  color: var(--text-primary);
+  border-color: var(--accent-deep);
 }
 
-.bi-table-row {
-  border-bottom: 1px solid var(--border-subtle);
-  transition: background-color 0.15s ease;
+/* Inputs */
+.lf-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: 8px;
+  transition: .2s ease;
 }
-
-.bi-table-row:hover {
-  background-color: var(--bg-surface-hover);
+.lf-input::placeholder { color: var(--text-tertiary); }
+.lf-input:focus {
+  outline: none;
+  border-color: var(--accent-soft);
+  box-shadow: 0 0 0 3px rgba(223,244,90,.15);
 }
 
 /* ──── Scrollbar ──── */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-tertiary);
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
 /* ──── Animations ──── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out forwards;
-}
+.animate-fadeUp { animation: fadeUp .32s ease both; }
+.animate-fadeIn { animation: fadeIn .3s ease-out forwards; }
 
-@keyframes shimmerBI {
+@keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-surface-hover) 25%,
-    var(--border-subtle) 50%,
-    var(--bg-surface-hover) 75%
-  );
+  background: linear-gradient(90deg, var(--bg-surface-hover) 25%, var(--border-subtle) 50%, var(--bg-surface-hover) 75%);
   background-size: 200% 100%;
-  animation: shimmerBI 1.5s infinite;
-  border-radius: 2px;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
+
+/* ──── Drawer ──── */
+.drawer-backdrop {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .24s ease;
+}
+.drawer-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.lead-drawer {
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.lead-drawer.open {
+  transform: translateX(0);
+}
+
+/* ──── Toast ──── */
+.toast-slide {
+  transform: translateY(140%);
+  transition: transform .25s ease;
+}
+.toast-slide.show {
+  transform: translateY(0);
+}
+
+/* ──── Chart grid background ──── */
+.chart-grid {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 24%,
+    var(--border-subtle) 25%,
+    transparent 26%,
+    transparent 49%,
+    var(--border-subtle) 50%,
+    transparent 51%,
+    transparent 74%,
+    var(--border-subtle) 75%,
+    transparent 76%
+  );
+}
+
+/* ──── Workflow pipeline ──── */
+.workflow-node { position: relative; z-index: 2; }
+.workflow-line { height: 1px; background: var(--border-strong); flex: 1; min-width: 20px; }
+.workflow-node.active-node { border-color: var(--accent-soft) !important; box-shadow: 0 0 0 5px rgba(223,244,90,.18); }
+
+/* ──── Progress steps ──── */
+.progress-item { border-left: 1px solid var(--border-strong); }
+.progress-item.complete { border-left-color: var(--accent-soft); }
+.progress-dot {
+  width: 18px; height: 18px; margin-left: -10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: transparent;
+  border-radius: 50%;
+  display: grid; place-items: center;
+}
+.complete .progress-dot {
+  background: #e9f8d6;
+  border-color: #b9d880;
+  color: #527b14;
+}
+.dark .complete .progress-dot {
+  background: rgba(85,124,25,.2);
+  border-color: #6a9424;
+  color: #b9d654;
+}
+
+/* Search prompt shadow */
+.search-prompt {
+  box-shadow: 0 18px 42px rgba(30,48,35,.07);
 }

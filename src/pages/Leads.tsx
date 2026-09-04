@@ -6,15 +6,15 @@ import {
   AlertTriangle,
   LayoutGrid,
   List,
-  Columns2,
-  Users,
+  Sparkles,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import LeadTable from '../components/LeadTable';
 import LeadCard from '../components/LeadCard';
 import LeadDetails from '../components/LeadDetails';
 import EmailComposer from '../components/EmailComposer';
-import MailWorkspace from '../components/MailWorkspace';
 import FilterBar from '../components/FilterBar';
 import BulkActionBar from '../components/BulkActionBar';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -49,20 +49,14 @@ export default function Leads() {
 
   const navigate = useNavigate();
 
-  // View state: 'table' | 'grid'
   const [view, setView] = useState<'table' | 'grid'>(() => {
     return (localStorage.getItem('leadgen_lead_view') as 'table' | 'grid') || 'table';
   });
-
-  // Tab state: 'new' | 'contacted'
   const [activeTab, setActiveTab] = useState<'new' | 'contacted'>('new');
-
-  // Split workspace panel toggle on large screens
-  const [showSideWorkspace, setShowSideWorkspace] = useState(true);
-
-  // Modals state
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSendAllConfirm, setShowSendAllConfirm] = useState(false);
+  const [showBulkSendConfirm, setShowBulkSendConfirm] = useState(false);
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isBulkSending, setIsBulkSending] = useState(false);
 
   const handleViewChange = (newView: 'table' | 'grid') => {
@@ -102,10 +96,9 @@ export default function Leads() {
     return { newLeadsCount: newCount, contactedLeadsCount: contactedCount };
   }, [leads, sentLeadIds, generatedEmails]);
 
-  // Filter leads based on filterOptions and activeTab
+  // Filter leads
   const filteredLeads = useMemo(() => {
     return leads.filter((lead) => {
-      // Query filter
       if (filterOptions.query) {
         const q = filterOptions.query.toLowerCase();
         const matchesName = lead.name?.toLowerCase().includes(q);
@@ -125,62 +118,32 @@ export default function Leads() {
           return false;
         }
       }
-
-      // Company filter
-      if (filterOptions.company && lead.company !== filterOptions.company) {
-        return false;
-      }
-
-      // Location filter
-      if (filterOptions.location && lead.location !== filterOptions.location) {
-        return false;
-      }
-
-      // Source filter
-      if (filterOptions.source && lead.source !== filterOptions.source) {
-        return false;
-      }
-
-      // Status filter
-      if (filterOptions.status === 'hasEmail' && !lead.email) {
-        return false;
-      }
-      if (filterOptions.status === 'noEmail' && lead.email) {
-        return false;
-      }
+      if (filterOptions.company && lead.company !== filterOptions.company) return false;
+      if (filterOptions.location && lead.location !== filterOptions.location) return false;
+      if (filterOptions.source && lead.source !== filterOptions.source) return false;
+      if (filterOptions.status === 'hasEmail' && !lead.email) return false;
+      if (filterOptions.status === 'noEmail' && lead.email) return false;
 
       const leadKey = lead.leadId || lead.postUrl || lead.name;
       const draft = generatedEmails[leadKey];
       const isSent = sentLeadIds.includes(leadKey) || draft?.status === 'sent';
       const hasDraft = !!(draft?.subject || draft?.body);
 
-      // Folder Tab check
-      if (activeTab === 'new' && isSent) {
-        return false;
-      }
-      if (activeTab === 'contacted' && !isSent) {
-        return false;
-      }
-
-      if (filterOptions.status === 'generated' && !hasDraft) {
-        return false;
-      }
-      if (filterOptions.status === 'sent' && !isSent) {
-        return false;
-      }
+      if (activeTab === 'new' && isSent) return false;
+      if (activeTab === 'contacted' && !isSent) return false;
+      if (filterOptions.status === 'generated' && !hasDraft) return false;
+      if (filterOptions.status === 'sent' && !isSent) return false;
 
       return true;
     });
-  }, [leads, filterOptions, generatedEmails, sentLeadIds]);
+  }, [leads, filterOptions, generatedEmails, sentLeadIds, activeTab]);
 
-  // Selected leads list
   const selectedLeads = useMemo(() => {
     return leads.filter((l) =>
       selectedLeadIds.includes(l.leadId || l.postUrl || l.name)
     );
   }, [leads, selectedLeadIds]);
 
-  // Active lead for side workspace
   const activeWorkspaceLead = useMemo(() => {
     if (!activeWorkspaceLeadId) return filteredLeads[0] || null;
     return (
@@ -192,16 +155,21 @@ export default function Leads() {
     );
   }, [activeWorkspaceLeadId, leads, filteredLeads]);
 
-  // Bulk Actions
-  const handleBulkGenerate = () => {
-    generateBulkEmails(selectedLeads);
+  const handleBulkGenerate = async (leadsToGenerate: Lead[] = selectedLeads) => {
+    setIsBulkGenerating(true);
+    try {
+      await generateBulkEmails(leadsToGenerate.length > 0 ? leadsToGenerate : filteredLeads);
+    } finally {
+      setIsBulkGenerating(false);
+    }
   };
 
-  const handleBulkSendConfirm = async () => {
+  const handleBulkSendConfirm = async (leadsToSend: Lead[] = selectedLeads) => {
     setIsBulkSending(true);
     try {
-      await sendBulkEmails(selectedLeads);
+      await sendBulkEmails(leadsToSend.length > 0 ? leadsToSend : filteredLeads);
       setShowSendAllConfirm(false);
+      setShowBulkSendConfirm(false);
     } finally {
       setIsBulkSending(false);
     }
@@ -213,78 +181,78 @@ export default function Leads() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn pb-24">
+    <div className="space-y-5 animate-fadeUp pb-24">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sm bg-[var(--color-primary)] flex items-center justify-center">
-            <Users className="w-5 h-5 text-white" />
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[.17em] text-[var(--text-secondary)] mb-2">
+            Pipeline
+          </p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-[-.05em] m-0 text-[var(--text-primary)]">
+              Leads
+            </h1>
+            <span className="text-xs font-bold px-2 py-1 rounded-lg bg-[var(--color-primary-bg)] text-[var(--accent-mid)]">
+              {filteredLeads.length} of {leads.length}
+            </span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-                Leads Workspace
-              </h1>
-              <span className="px-2 py-0.5 rounded-sm text-xs font-bold bg-[var(--bg-surface-hover)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-                {filteredLeads.length} of {leads.length}
-              </span>
-            </div>
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              Review, filter, generate outreach emails, and execute campaigns.
-            </p>
-          </div>
+          <p className="text-sm text-[var(--text-secondary)] mt-2 mb-0">
+            Review, filter, and manage outreach campaigns.
+          </p>
         </div>
 
         {/* Action Controls & View Switcher */}
         <div className="flex items-center gap-2 self-start flex-wrap">
-          {/* Side-by-side workspace toggle (desktop only) */}
+          
           <button
-            type="button"
-            onClick={() => setShowSideWorkspace((prev) => !prev)}
-            className={`hidden xl:inline-flex items-center gap-1.5 px-3 py-2 rounded-sm border text-xs font-semibold transition-all ${
-              showSideWorkspace
-                ? 'bg-[var(--color-primary-bg)] border-[var(--color-primary)] text-[var(--color-primary)]'
-                : 'bg-[var(--bg-surface)] border-[var(--border-strong)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]'
-            }`}
-            title="Toggle side-by-side Email Workspace"
+            onClick={() => handleBulkGenerate(filteredLeads)}
+            disabled={isBulkGenerating || filteredLeads.length === 0}
+            className="soft-button inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
           >
-            <Columns2 className="w-3.5 h-3.5" />
-            <span>Email Workspace</span>
+            {isBulkGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            <span>Generate All</span>
+          </button>
+          
+          <button
+            onClick={() => setShowSendAllConfirm(true)}
+            disabled={isBulkSending || filteredLeads.length === 0}
+            className="lime-button inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
+          >
+            {isBulkSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+            <span>Send All</span>
           </button>
 
-          {/* Grid vs Table Switcher */}
-          <div className="flex items-center border border-[var(--border-strong)] rounded-sm bg-[var(--bg-surface)] p-0.5">
+          {/* View Switcher */}
+          <div className="flex items-center surface rounded-lg p-1 ml-2">
             <button
               onClick={() => handleViewChange('table')}
-              className={`p-1.5 rounded-sm transition-all ${
+              className={`p-2 rounded-lg transition-all ${
                 view === 'table'
-                  ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
+                  ? 'bg-[var(--color-primary-bg)] text-[var(--accent-mid)]'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
               }`}
               aria-label="Table view"
-              title="Table view"
             >
               <List className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleViewChange('grid')}
-              className={`p-1.5 rounded-sm transition-all ${
+              className={`p-2 rounded-lg transition-all ${
                 view === 'grid'
-                  ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
+                  ? 'bg-[var(--color-primary-bg)] text-[var(--accent-mid)]'
+                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
               }`}
               aria-label="Grid view"
-              title="Grid view"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Refresh Button */}
+          {/* Refresh */}
           <button
             onClick={refreshLeads}
             disabled={leadsLoading}
-            className="bi-button-secondary inline-flex items-center gap-1.5 px-3 py-2 text-xs"
+            className="soft-button inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
           >
             <RefreshCw
               className={`w-3.5 h-3.5 ${leadsLoading ? 'animate-spin' : ''}`}
@@ -295,36 +263,36 @@ export default function Leads() {
       </div>
 
       {/* Folder Tabs */}
-      <div className="flex items-center gap-1 border-b border-[var(--border-subtle)] pb-px">
+      <div className="flex items-center gap-1 border-b border-[var(--border-subtle)]">
         <button
           onClick={() => setActiveTab('new')}
-          className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
-            activeTab === 'new'
-              ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
-              : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)]'
+          className={`tab-button px-4 py-3 text-sm font-semibold ${
+            activeTab === 'new' ? 'active' : ''
           }`}
         >
           New Leads
-          <span className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded-sm ${activeTab === 'new' ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : 'bg-[var(--bg-surface-hover)] text-[var(--text-tertiary)]'}`}>
+          <span className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded-lg ${
+            activeTab === 'new' ? 'bg-[var(--color-primary-bg)] text-[var(--accent-mid)]' : 'bg-[var(--bg-surface-hover)] text-[var(--text-tertiary)]'
+          }`}>
             {newLeadsCount}
           </span>
         </button>
         <button
           onClick={() => setActiveTab('contacted')}
-          className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors ${
-            activeTab === 'contacted'
-              ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
-              : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)]'
+          className={`tab-button px-4 py-3 text-sm font-semibold ${
+            activeTab === 'contacted' ? 'active' : ''
           }`}
         >
           Contacted
-          <span className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded-sm ${activeTab === 'contacted' ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]' : 'bg-[var(--bg-surface-hover)] text-[var(--text-tertiary)]'}`}>
+          <span className={`ml-2 text-xs font-bold px-1.5 py-0.5 rounded-lg ${
+            activeTab === 'contacted' ? 'bg-[var(--color-primary-bg)] text-[var(--accent-mid)]' : 'bg-[var(--bg-surface-hover)] text-[var(--text-tertiary)]'
+          }`}>
             {contactedLeadsCount}
           </span>
         </button>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter Bar */}
       {leads.length > 0 && (
         <FilterBar
           leads={leads}
@@ -334,7 +302,7 @@ export default function Leads() {
 
       {/* Main Workspace Layout */}
       {leadsError ? (
-        <div className="bi-widget p-8 text-center max-w-md mx-auto border-l-4 border-[var(--color-danger)]">
+        <div className="surface p-8 text-center max-w-md mx-auto border-l-4 border-l-[var(--color-danger)]">
           <AlertTriangle className="w-10 h-10 text-[var(--color-danger)] mx-auto mb-3" />
           <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">
             Unable to load leads
@@ -342,7 +310,7 @@ export default function Leads() {
           <p className="text-xs text-[var(--text-secondary)] mb-5">{leadsError}</p>
           <button
             onClick={refreshLeads}
-            className="bi-button inline-flex items-center justify-center gap-2 px-4 py-2 text-xs"
+            className="lime-button inline-flex items-center justify-center gap-2 px-4 py-2 text-xs"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Try Again
@@ -356,7 +324,7 @@ export default function Leads() {
           action={
             <button
               onClick={() => navigate('/find-leads')}
-              className="bi-button inline-flex items-center gap-2 px-5 py-2.5 text-xs"
+              className="lime-button inline-flex items-center gap-2 px-5 py-2.5 text-sm"
             >
               <Search className="w-4 h-4" />
               Find New Leads
@@ -369,26 +337,16 @@ export default function Leads() {
           action={
             <button
               onClick={() => {}}
-              className="bi-button-secondary inline-flex items-center gap-1.5 px-4 py-2 text-xs"
+              className="soft-button inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl"
             >
               Clear Filters
             </button>
           }
         />
       ) : (
-        <div
-          className={`grid gap-6 ${
-            showSideWorkspace
-              ? 'xl:grid-cols-12 xl:items-start'
-              : 'grid-cols-1'
-          }`}
-        >
-          {/* Left Column: Leads List (Table or Grid) */}
-          <div
-            className={
-              showSideWorkspace ? 'xl:col-span-7 2xl:col-span-8' : 'w-full'
-            }
-          >
+        <div className="grid gap-5 grid-cols-1">
+          {/* Leads List */}
+          <div className="w-full">
             {view === 'table' ? (
               <LeadTable
                 leads={filteredLeads}
@@ -409,25 +367,18 @@ export default function Leads() {
               </div>
             )}
           </div>
-
-          {/* Right Column: Generated Email Workspace (Desktop) */}
-          {showSideWorkspace && (
-            <div className="hidden xl:block xl:col-span-5 2xl:col-span-4 sticky top-6 max-h-[calc(100vh-6rem)]">
-              <MailWorkspace lead={activeWorkspaceLead} />
-            </div>
-          )}
         </div>
       )}
 
-      {/* Floating Bulk Action Bar */}
+      {/* Bulk Action Bar */}
       <BulkActionBar
         selectedLeads={selectedLeads}
-        onGenerateAll={handleBulkGenerate}
-        onSendAll={() => setShowSendAllConfirm(true)}
+        onGenerateAll={() => handleBulkGenerate(selectedLeads)}
+        onSendAll={() => setShowBulkSendConfirm(true)}
         onClear={clearSelection}
       />
 
-      {/* Lead Details Modal */}
+      {/* Lead Details Drawer */}
       {showLeadDetails && selectedLead && (
         <LeadDetails
           lead={selectedLead}
@@ -439,7 +390,7 @@ export default function Leads() {
         />
       )}
 
-      {/* Email Composer Modal (for mobile or direct modal edit) */}
+      {/* Email Composer */}
       {showEmailComposer && selectedLead && (
         <EmailComposer
           lead={selectedLead}
@@ -450,7 +401,7 @@ export default function Leads() {
         />
       )}
 
-      {/* Reset Leads Confirmation Modal */}
+      {/* Confirmation Modals */}
       <ConfirmationModal
         isOpen={showResetConfirm}
         title="Reset Leads & Start Fresh?"
@@ -462,17 +413,28 @@ export default function Leads() {
         onCancel={() => setShowResetConfirm(false)}
       />
 
-      {/* Bulk Send Confirmation Modal */}
       <ConfirmationModal
         isOpen={showSendAllConfirm}
-        title={`Send ${selectedLeads.length} Emails?`}
+        title={`Send ${filteredLeads.length} Emails?`}
         description="These emails will be dispatched sequentially using your connected outreach workflow. This action cannot be undone."
+        confirmLabel={`Send ${filteredLeads.length} Emails`}
+        cancelLabel="Cancel"
+        variant="success"
+        loading={isBulkSending}
+        onConfirm={() => handleBulkSendConfirm(filteredLeads)}
+        onCancel={() => setShowSendAllConfirm(false)}
+      />
+
+      <ConfirmationModal
+        isOpen={showBulkSendConfirm}
+        title={`Send ${selectedLeads.length} Selected Emails?`}
+        description="These emails will be dispatched sequentially. This action cannot be undone."
         confirmLabel={`Send ${selectedLeads.length} Emails`}
         cancelLabel="Cancel"
         variant="success"
         loading={isBulkSending}
-        onConfirm={handleBulkSendConfirm}
-        onCancel={() => setShowSendAllConfirm(false)}
+        onConfirm={() => handleBulkSendConfirm(selectedLeads)}
+        onCancel={() => setShowBulkSendConfirm(false)}
       />
     </div>
   );

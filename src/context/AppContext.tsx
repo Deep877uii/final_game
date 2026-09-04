@@ -50,7 +50,7 @@ interface AppState {
 
 interface AppContextType extends AppState {
   refreshLeads: () => Promise<void>;
-  resetLeads: () => void;
+  resetLeads: () => Promise<void>;
   addToast: (type: Toast['type'], message: string) => void;
   removeToast: (id: string) => void;
   incrementEmailsSent: () => void;
@@ -153,14 +153,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [connected, setConnected] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const [emailsSent, setEmailsSent] = useState(() => {
-    const stored = localStorage.getItem('emailsSent');
-    return stored ? parseInt(stored, 10) : 0;
-  });
-  const [emailsGenerated, setEmailsGenerated] = useState(() => {
-    const stored = localStorage.getItem('emailsGenerated');
-    return stored ? parseInt(stored, 10) : 0;
-  });
 
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [emailDraft, setEmailDraft] = useState<EmailDraft | null>(null);
@@ -195,6 +187,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return [];
     }
   });
+
+  const emailsSent = sentLeadIds.length;
+  const emailsGenerated = Object.keys(generatedEmails).length;
 
   const [activeWorkspaceLeadId, setActiveWorkspaceLeadId] = useState<string | null>(null);
   const [bulkProgress, setBulkProgress] = useState<BulkProgressState | null>(null);
@@ -274,31 +269,44 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const resetLeads = useCallback(() => {
+  const resetLeads = useCallback(async () => {
     setLeads([]);
     setSelectedLeadIds([]);
     setSelectedLead(null);
     setEmailDraft(null);
     setActiveWorkspaceLeadId(null);
     setBulkProgress(null);
+    setGeneratedEmails({});
+    setSentLeadIds([]);
+    try {
+      localStorage.removeItem('leadgen_generated_emails');
+      localStorage.removeItem('leadgen_sent_lead_ids');
+    } catch {}
+
+    try {
+      const response = await fetch('https://deepashu1.app.n8n.cloud/webhook/reset-leads', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      if (response.ok) {
+        console.log('Database reset webhook triggered.');
+      } else {
+        const errorText = await response.text();
+        console.error('n8n error response:', response.status, errorText);
+        addToast('error', `n8n Error (${response.status}): ${errorText.substring(0, 50)}`);
+      }
+    } catch (error) {
+      addToast('error', 'Error calling reset webhook (make sure n8n is listening).');
+      console.error('Webhook error:', error);
+    }
+
     addToast('info', 'Leads reset. Start a fresh search.');
   }, [addToast]);
 
-  const incrementEmailsSent = useCallback(() => {
-    setEmailsSent((prev) => {
-      const next = prev + 1;
-      localStorage.setItem('emailsSent', String(next));
-      return next;
-    });
-  }, []);
-
-  const incrementEmailsGenerated = useCallback(() => {
-    setEmailsGenerated((prev) => {
-      const next = prev + 1;
-      localStorage.setItem('emailsGenerated', String(next));
-      return next;
-    });
-  }, []);
+  const incrementEmailsSent = useCallback(() => {}, []);
+  const incrementEmailsGenerated = useCallback(() => {}, []);
 
   // Selection handlers
   const toggleSelectLead = useCallback((leadId: string) => {

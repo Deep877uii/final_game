@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Send,
@@ -194,7 +195,7 @@ export default function EmailComposer({
     }
   }
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       className="fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
@@ -465,6 +466,7 @@ export default function EmailComposer({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

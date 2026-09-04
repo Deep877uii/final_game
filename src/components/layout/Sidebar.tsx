@@ -2,28 +2,30 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Search,
-  Users,
-  Mail,
-  Settings,
+  ContactRound,
+  Send,
+  Settings2,
   X,
-  BarChart3,
+  Sparkles,
+  AlertCircle,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/find-leads', icon: Search, label: 'Find Leads' },
-  { to: '/leads', icon: Users, label: 'Leads' },
-  { to: '/outreach', icon: Mail, label: 'Outreach' },
-  { to: '/settings', icon: Settings, label: 'Settings' },
+  { to: '/find-leads', icon: Search, label: 'Search Leads' },
+  { to: '/leads', icon: ContactRound, label: 'Leads' },
+  { to: '/outreach', icon: Send, label: 'Email Campaigns' },
+  { to: '/settings', icon: Settings2, label: 'Settings' },
 ];
 
 interface SidebarProps {
   open: boolean;
+  collapsed?: boolean;
   onClose: () => void;
 }
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+export default function Sidebar({ open, collapsed, onClose }: SidebarProps) {
   const { connected, leads } = useApp();
   const location = useLocation();
 
@@ -32,7 +34,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       {/* Mobile Backdrop */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden animate-fadeIn"
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden animate-fadeIn"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -40,37 +42,40 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={`
-          fixed top-0 left-0 z-50 h-full w-64 bg-[var(--bg-surface)] border-r border-[var(--border-subtle)]
-          flex flex-col transition-transform duration-300 ease-out
-          lg:translate-x-0 lg:static lg:z-auto
+          fixed top-0 left-0 z-50 h-full w-[248px]
+          bg-[var(--nav)] text-[#edf4ed]
+          flex flex-col
+          transition-transform duration-300 ease-out
+          ${collapsed ? 'lg:-translate-x-full' : 'lg:translate-x-0'}
           ${open ? 'translate-x-0' : '-translate-x-full'}
         `}
+        style={{ padding: '25px 16px' }}
         role="navigation"
         aria-label="Main navigation"
       >
-        {/* Logo & Brand Header */}
-        <div className="flex items-center justify-between px-5 h-14 border-b border-[var(--border-subtle)] bg-[var(--bg-surface-raised)]">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[var(--color-primary)] flex items-center justify-center text-white">
-              <BarChart3 className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-sm font-semibold text-[var(--text-primary)] block leading-none">
-                LeadGen Analytics
-              </span>
-            </div>
+        {/* Brand */}
+        <header className="flex items-center gap-3 px-2 mb-10">
+          <div className="w-8 h-8 rounded-lg bg-[var(--accent)] text-[#17211d] grid place-items-center font-bold text-sm"
+               style={{ boxShadow: '0 8px 20px rgba(223,244,90,.16)' }}>
+            L
           </div>
+          <div className="min-w-0 hidden sm:block sidebar-copy">
+            <p className="text-[15px] font-bold tracking-tight leading-none m-0">LeadForge</p>
+            <p className="text-[10px] uppercase tracking-[.16em] text-[#9bad9f] mt-0.5 m-0">AI Platform</p>
+          </div>
+
+          {/* Mobile close */}
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 rounded-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] transition-colors"
+            className="lg:hidden ml-auto p-1.5 rounded-lg text-[#b9c4bc] hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Close navigation"
           >
             <X className="w-4 h-4" />
           </button>
-        </div>
+        </header>
 
-        {/* Navigation List */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {/* Navigation */}
+        <nav className="space-y-1 flex-1">
           {navItems.map(({ to, icon: Icon, label }) => {
             const isActive =
               to === '/'
@@ -83,38 +88,32 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 to={to}
                 onClick={onClose}
                 className={`
-                  flex items-center justify-between px-3 py-2 text-sm font-medium
-                  transition-colors rounded-sm relative
+                  w-full flex items-center gap-3 rounded-lg px-3 py-2.5
+                  text-sm font-medium border transition-all duration-150
                   ${
                     isActive
-                      ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]'
+                      ? 'text-white bg-white/[.09] border-white/[.06]'
+                      : 'text-[#b9c4bc] border-transparent hover:text-white hover:bg-white/[.09] hover:border-white/[.06]'
                   }
                 `}
                 aria-current={isActive ? 'page' : undefined}
               >
-                {/* Active indicator line */}
-                {isActive && (
-                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--color-primary)] rounded-r-sm" />
-                )}
-                <div className="flex items-center gap-3">
-                  <Icon
-                    className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                      isActive
-                        ? 'text-[var(--color-primary)]'
-                        : 'text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)]'
-                    }`}
-                  />
-                  <span>{label}</span>
-                </div>
+                <Icon className="w-[18px] h-[18px] flex-shrink-0" />
+                <span className="sidebar-copy">{label}</span>
+
+                {/* Active dot */}
+                <span
+                  className={`ml-auto w-1.5 h-1.5 rounded-full sidebar-copy transition-all ${
+                    isActive
+                      ? 'bg-[var(--accent)]'
+                      : 'bg-transparent'
+                  }`}
+                  style={isActive ? { boxShadow: '0 0 0 4px rgba(223,244,90,.12)' } : undefined}
+                />
+
+                {/* Lead count badge */}
                 {to === '/leads' && leads.length > 0 && (
-                  <span
-                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold tabular-nums ${
-                      isActive
-                        ? 'bg-[var(--color-primary)] text-white'
-                        : 'bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] text-[var(--text-secondary)]'
-                    }`}
-                  >
+                  <span className="ml-auto text-[10px] font-bold text-[#9bad9f] sidebar-copy">
                     {leads.length}
                   </span>
                 )}
@@ -123,30 +122,39 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           })}
         </nav>
 
-        {/* Sidebar Footer — Status */}
-        <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface-raised)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span
-                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                    connected ? 'bg-[var(--color-success)]' : 'bg-[var(--color-danger)]'
-                  }`}
-                />
-                <span
-                  className={`relative inline-flex rounded-full h-2 w-2 ${
-                    connected ? 'bg-[var(--color-success)]' : 'bg-[var(--color-danger)]'
-                  }`}
-                />
-              </span>
-              <span className="text-xs font-semibold text-[var(--text-secondary)]">
-                {connected ? 'n8n Active' : 'Offline'}
-              </span>
-            </div>
-            <span className="text-[10px] text-[var(--text-tertiary)] font-mono">v1.0</span>
+        {/* AI Credits / Connection Status */}
+        <div className="mt-auto rounded-lg bg-white/5 border border-white/10 p-3 sidebar-copy">
+          <div className={`flex items-center gap-2 text-xs font-semibold ${connected ? 'text-[var(--accent)]' : 'text-[#d4a23e]'}`}>
+            {connected ? <Sparkles className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+            <span>{connected ? 'n8n Connected' : 'Setup Required'}</span>
+          </div>
+          <p className="text-xs text-[#b9c4bc] mt-2 mb-2">
+            {leads.length} leads in workspace
+          </p>
+          <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-[var(--accent)] transition-all duration-500"
+              style={{ width: connected ? '82%' : '0%' }}
+            />
           </div>
         </div>
       </aside>
+
+      {/* Responsive styles for collapsed sidebar */}
+      <style>{`
+        @media (max-width: 900px) and (min-width: 641px) {
+          aside[role="navigation"] {
+            width: 76px !important;
+            flex-basis: 76px !important;
+            padding: 22px 10px !important;
+          }
+          .sidebar-copy { display: none !important; }
+          aside[role="navigation"] a { justify-content: center; padding: 12px; }
+        }
+        @media (max-width: 640px) {
+          aside[role="navigation"].lg\\:sticky { position: fixed; }
+        }
+      `}</style>
     </>
   );
 }

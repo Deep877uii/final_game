@@ -1,4 +1,4 @@
-import { Eye, Mail, CheckCircle2, Sparkles } from 'lucide-react';
+import { Eye, Mail } from 'lucide-react';
 import type { Lead } from '../types/lead';
 import { useApp } from '../context/AppContext';
 
@@ -11,10 +11,17 @@ function formatDate(dateStr: string | null | undefined): string {
   try {
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return dateStr;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   } catch {
     return dateStr;
   }
+}
+
+function getStatusBadge(isSent: boolean, hasDraft: boolean, isGenerating: boolean) {
+  if (isSent) return <span className="badge badge-emailed">Sent</span>;
+  if (isGenerating) return <span className="badge badge-generated">Generating</span>;
+  if (hasDraft) return <span className="badge badge-replied">Draft Ready</span>;
+  return <span className="badge badge-new">New</span>;
 }
 
 interface LeadTableProps {
@@ -60,13 +67,12 @@ export default function LeadTable({
   };
 
   return (
-    <div className="bi-widget overflow-hidden">
+    <div className="surface overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm border-collapse">
-          <thead>
-            <tr className="bi-table-header">
-              {/* Select All Checkbox */}
-              <th className="w-12 px-4 py-3 text-center">
+        <table className="w-full text-sm min-w-[900px]">
+          <thead className="bg-[var(--bg-surface-hover)] text-left text-[10px] uppercase tracking-wider text-[var(--text-tertiary)]">
+            <tr>
+              <th className="p-4 w-11">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -74,21 +80,20 @@ export default function LeadTable({
                     if (input) input.indeterminate = someSelected;
                   }}
                   onChange={handleHeaderCheckbox}
-                  className="w-4 h-4 rounded-sm text-[var(--color-primary)] border-[var(--border-strong)] bg-transparent focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
+                  className="w-4 h-4 cursor-pointer accent-[var(--accent-mid)]"
                   aria-label="Select all leads"
                 />
               </th>
-              <th className="px-4 py-3">Lead</th>
-              <th className="px-4 py-3 hidden md:table-cell">Company</th>
-              <th className="px-4 py-3 hidden lg:table-cell">Role</th>
-              <th className="px-4 py-3 hidden lg:table-cell">Location</th>
-              <th className="px-4 py-3 hidden sm:table-cell">Email</th>
-              <th className="px-4 py-3 hidden xl:table-cell">Status</th>
-              <th className="px-4 py-3 hidden 2xl:table-cell">Posted</th>
-              <th className="px-4 py-3 text-right">Actions</th>
+              <th className="p-4 font-semibold">Name</th>
+              <th className="p-4 font-semibold">Company</th>
+              <th className="p-4 font-semibold hidden lg:table-cell">Job role</th>
+              <th className="p-4 font-semibold hidden sm:table-cell">Email</th>
+              <th className="p-4 font-semibold">Status</th>
+              <th className="p-4 font-semibold hidden xl:table-cell">Posted</th>
+              <th className="p-4 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--border-subtle)] bg-[var(--bg-surface)]">
+          <tbody>
             {leads.map((lead) => {
               const leadKey = lead.leadId || lead.postUrl || lead.name;
               const isSelected = selectedLeadIds.includes(leadKey);
@@ -102,7 +107,7 @@ export default function LeadTable({
                 <tr
                   key={leadKey}
                   onClick={() => setActiveWorkspaceLeadId(leadKey)}
-                  className={`bi-table-row cursor-pointer group ${
+                  className={`table-row border-t border-[var(--border-subtle)] ${
                     isActive
                       ? 'bg-[var(--color-primary-bg)]'
                       : isSelected
@@ -110,9 +115,9 @@ export default function LeadTable({
                       : ''
                   }`}
                 >
-                  {/* Row Checkbox */}
+                  {/* Checkbox */}
                   <td
-                    className="w-12 px-4 py-3 text-center"
+                    className="p-4"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleSelectLead(leadKey);
@@ -122,98 +127,55 @@ export default function LeadTable({
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => {}}
-                      className="w-4 h-4 rounded-sm text-[var(--color-primary)] border-[var(--border-strong)] bg-transparent focus:ring-[var(--color-primary)] cursor-pointer accent-[var(--color-primary)]"
+                      className="w-4 h-4 cursor-pointer accent-[var(--accent-mid)]"
                       aria-label={`Select ${lead.name}`}
                     />
                   </td>
 
-                  {/* Lead Info */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-sm bg-[var(--color-primary)] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                        {(lead.name || '?')[0]?.toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-[var(--text-primary)] truncate max-w-[150px] leading-tight group-hover:text-[var(--color-primary)] transition-colors">
-                          {displayValue(lead.name)}
-                        </p>
-                        <p className="text-xs text-[var(--text-secondary)] truncate max-w-[150px] md:hidden">
-                          {displayValue(lead.company)}
-                        </p>
-                      </div>
-                    </div>
+                  {/* Name */}
+                  <td className="p-4 font-bold text-[var(--text-primary)]">
+                    {displayValue(lead.name)}
                   </td>
 
                   {/* Company */}
-                  <td className="px-4 py-3 text-[var(--text-secondary)] hidden md:table-cell font-medium text-xs">
-                    <span className="truncate block max-w-[150px]">
-                      {displayValue(lead.company)}
-                    </span>
+                  <td className="p-4 text-[var(--text-secondary)]">
+                    {displayValue(lead.company)}
                   </td>
 
-                  {/* Role / Job Title */}
-                  <td className="px-4 py-3 text-[var(--text-secondary)] text-xs hidden lg:table-cell">
-                    <span className="truncate block max-w-[160px]">
-                      {displayValue(lead.jobTitle || lead.role)}
-                    </span>
-                  </td>
-
-                  {/* Location */}
-                  <td className="px-4 py-3 text-[var(--text-secondary)] text-xs hidden lg:table-cell">
-                    <span className="truncate block max-w-[130px]">
-                      {displayValue(lead.location)}
-                    </span>
+                  {/* Role */}
+                  <td className="p-4 text-[var(--text-secondary)] hidden lg:table-cell">
+                    {displayValue(lead.jobTitle || lead.role)}
                   </td>
 
                   {/* Email */}
-                  <td className="px-4 py-3 hidden sm:table-cell text-xs">
+                  <td className="p-4 hidden sm:table-cell">
                     {lead.email ? (
-                      <span className="text-[var(--text-secondary)] font-mono truncate block max-w-[170px]">
+                      <span className="text-[var(--text-secondary)] font-mono text-xs">
                         {lead.email}
                       </span>
                     ) : (
-                      <span className="text-[var(--text-tertiary)] italic">Missing</span>
+                      <span className="text-[var(--text-tertiary)]">—</span>
                     )}
                   </td>
 
-                  {/* Status Badge */}
-                  <td className="px-4 py-3 hidden xl:table-cell">
-                    {isSent ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[11px] font-semibold bg-[var(--color-success-bg)] text-[var(--color-success)]">
-                        <CheckCircle2 className="w-3 h-3" /> Sent
-                      </span>
-                    ) : hasDraft ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[11px] font-semibold bg-[var(--color-primary-bg)] text-[var(--color-bi-purple)]">
-                        <Sparkles className="w-3 h-3" /> Draft
-                      </span>
-                    ) : isGenerating ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm text-[11px] font-semibold bg-[var(--color-primary-bg)] text-[var(--color-primary)]">
-                        <div className="w-2.5 h-2.5 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
-                        Generating
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[11px] font-medium bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] text-[var(--text-secondary)]">
-                        Ready
-                      </span>
-                    )}
+                  {/* Status */}
+                  <td className="p-4">
+                    {getStatusBadge(isSent, hasDraft, isGenerating)}
                   </td>
 
-                  {/* Posted Date */}
-                  <td className="px-4 py-3 text-[var(--text-tertiary)] text-xs hidden 2xl:table-cell">
+                  {/* Posted */}
+                  <td className="p-4 text-[var(--text-secondary)] hidden xl:table-cell">
                     {formatDate(lead.postedAt)}
                   </td>
 
                   {/* Actions */}
-                  <td
-                    className="px-4 py-3 text-right"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => onView(lead)}
-                        className="bi-button-secondary px-2.5 py-1.5 flex items-center gap-1 text-xs"
-                        aria-label={`View details for ${lead.name}`}
+                        className="soft-button px-2.5 py-1.5 flex items-center gap-1 text-xs font-semibold rounded-lg"
+                        aria-label={`View ${lead.name}`}
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">View</span>
@@ -223,20 +185,20 @@ export default function LeadTable({
                         type="button"
                         onClick={() => onGenerateMail(lead)}
                         disabled={isGenerating}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-sm text-xs font-semibold transition-all ${
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                           hasDraft
-                            ? 'bg-[var(--color-primary-bg)] text-[var(--color-bi-purple)] hover:bg-[var(--color-primary-bg)]'
-                            : 'bi-button'
+                            ? 'soft-button text-[var(--color-purple)]'
+                            : 'lime-button'
                         }`}
                         aria-label={`Generate email for ${lead.name}`}
                       >
                         {isGenerating ? (
-                          <div className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                          <div className="w-3 h-3 border-2 border-current/40 border-t-current rounded-full animate-spin" />
                         ) : (
                           <Mail className="w-3.5 h-3.5" />
                         )}
                         <span className="hidden sm:inline">
-                          {hasDraft ? 'View Mail' : 'Generate'}
+                          {hasDraft ? 'Mail' : 'Generate'}
                         </span>
                       </button>
                     </div>

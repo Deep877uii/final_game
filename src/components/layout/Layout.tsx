@@ -6,17 +6,33 @@ import ToastContainer from '../Toast';
 import { useApp } from '../../context/AppContext';
 
 export default function Layout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false); // Mobile
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false); // Desktop
   const { theme } = useApp();
 
+  const toggleSidebar = () => {
+    if (window.innerWidth < 1024) {
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      setSidebarCollapsed(!sidebarCollapsed);
+    }
+  };
+
   return (
-    <div className={`flex min-h-screen font-sans antialiased ${theme === 'dark' ? 'dark' : ''}`}>
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+    <div className={`flex w-full min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+      <Sidebar 
+        open={sidebarOpen} 
+        collapsed={sidebarCollapsed}
+        onClose={() => setSidebarOpen(false)} 
+      />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <TopNav onMenuClick={() => setSidebarOpen(true)} />
+      {/* Spacer to push content right of the fixed sidebar on desktop */}
+      <div className={`hidden lg:block shrink-0 transition-all duration-300 ${sidebarCollapsed ? 'w-0' : 'w-[248px]'}`} />
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto w-full">
+      <div className="flex-1 min-w-0 flex flex-col transition-all duration-300">
+        <TopNav onMenuClick={toggleSidebar} />
+
+        <main className="flex-1 px-6 md:px-10 py-8 pb-12 w-full transition-all duration-300 overflow-x-hidden">
           <Outlet />
         </main>
       </div>

@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Search, Send, Sparkles, LayoutGrid, List } from 'lucide-react';
+import { Mail, Search, Send, Sparkles, LayoutGrid, List, Loader2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import LeadCard from '../components/LeadCard';
 import LeadTable from '../components/LeadTable';
 import LeadDetails from '../components/LeadDetails';
 import EmailComposer from '../components/EmailComposer';
+import ConfirmationModal from '../components/ConfirmationModal';
 import { TableSkeleton } from '../components/LoadingState';
 import EmptyState from '../components/EmptyState';
 import type { Lead } from '../types/lead';
@@ -23,10 +24,15 @@ export default function Outreach() {
     setShowLeadDetails,
     showEmailComposer,
     setShowEmailComposer,
+    generateBulkEmails,
+    sendBulkEmails,
   } = useApp();
   const navigate = useNavigate();
 
-  const [view, setView] = useState<'grid' | 'table'>('grid');
+  const [view, setView] = useState<'grid' | 'table'>('table');
+  const [showSendAllConfirm, setShowSendAllConfirm] = useState(false);
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [isBulkSending, setIsBulkSending] = useState(false);
 
   // Leads with valid email address
   const outreachLeads = leads.filter((l) => l.email && l.email.trim());
@@ -48,101 +54,94 @@ export default function Outreach() {
     [setSelectedLead, setShowLeadDetails, setShowEmailComposer]
   );
 
+  const handleBulkGenerate = async () => {
+    setIsBulkGenerating(true);
+    try {
+      await generateBulkEmails(outreachLeads);
+    } finally {
+      setIsBulkGenerating(false);
+    }
+  };
+
+  const handleBulkSendConfirm = async () => {
+    setIsBulkSending(true);
+    try {
+      await sendBulkEmails(outreachLeads);
+      setShowSendAllConfirm(false);
+    } finally {
+      setIsBulkSending(false);
+    }
+  };
+
   return (
-    <div className="space-y-7 animate-fadeIn">
+    <div className="space-y-5 animate-fadeUp">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sm bg-[var(--color-primary)] flex items-center justify-center text-white">
-            <Mail className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-              Outreach Campaigns
-            </h1>
-            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              Review prospects with verified email contacts and manage outreach dispatches.
-            </p>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[.17em] text-[var(--text-secondary)] mb-2">
+            Campaigns
+          </p>
+          <h1 className="text-3xl font-bold tracking-[-.05em] m-0 text-[var(--text-primary)]">
+            Email Campaigns
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-2 mb-0">
+            Manage AI-personalized outreach for verified contacts
+          </p>
         </div>
 
-        {/* View Switcher */}
+        {/* Actions & View Switcher */}
         {outreachLeads.length > 0 && (
-          <div className="flex items-center border border-[var(--border-strong)] rounded-sm bg-[var(--bg-surface)] p-0.5 self-start">
+          <div className="flex items-center gap-2 self-start flex-wrap">
             <button
-              onClick={() => setView('grid')}
-              className={`p-1.5 rounded-sm transition-all ${
-                view === 'grid'
-                  ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
-              }`}
-              aria-label="Grid view"
+              onClick={handleBulkGenerate}
+              disabled={isBulkGenerating}
+              className="soft-button inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
             >
-              <LayoutGrid className="w-4 h-4" />
+              {isBulkGenerating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+              <span>Generate All</span>
             </button>
             <button
-              onClick={() => setView('table')}
-              className={`p-1.5 rounded-sm transition-all ${
-                view === 'table'
-                  ? 'bg-[var(--color-primary-bg)] text-[var(--color-primary)]'
-                  : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]'
-              }`}
-              aria-label="Table view"
+              onClick={() => setShowSendAllConfirm(true)}
+              disabled={isBulkSending}
+              className="lime-button inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold"
             >
-              <List className="w-4 h-4" />
+              {isBulkSending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+              <span>Send All</span>
             </button>
+
+            {/* View Switcher */}
+            <div className="flex items-center surface rounded-lg p-1 ml-2">
+              <button
+                onClick={() => setView('grid')}
+                className={`p-2 rounded-md transition-all text-sm ${
+                  view === 'grid'
+                    ? 'bg-[var(--color-primary-bg)] text-[var(--accent-mid)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                }`}
+                aria-label="Grid view"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setView('table')}
+                className={`p-2 rounded-md transition-all text-sm ${
+                  view === 'table'
+                    ? 'bg-[var(--color-primary-bg)] text-[var(--accent-mid)]'
+                    : 'text-[var(--text-tertiary)] hover:text-[var(--text-primary)]'
+                }`}
+                aria-label="Table view"
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Quick Campaign Stats */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className="bi-widget p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-sm bg-[var(--color-primary-bg)] flex items-center justify-center text-[var(--color-primary)] flex-shrink-0">
-            <Mail className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
-              {outreachLeads.length}
-            </p>
-            <p className="text-[11px] font-semibold text-[var(--text-secondary)] mt-0.5 uppercase tracking-wider">
-              Verified Contacts
-            </p>
-          </div>
-        </div>
-
-        <div className="bi-widget p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-sm bg-[var(--color-purple-bg)] flex items-center justify-center text-[var(--color-purple)] flex-shrink-0">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
-              {emailsGenerated}
-            </p>
-            <p className="text-[11px] font-semibold text-[var(--text-secondary)] mt-0.5 uppercase tracking-wider">
-              AI Drafts Generated
-            </p>
-          </div>
-        </div>
-
-        <div className="bi-widget p-5 flex items-center gap-4">
-          <div className="w-10 h-10 rounded-sm bg-[var(--color-success-bg)] flex items-center justify-center text-[var(--color-success)] flex-shrink-0">
-            <Send className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-[var(--text-primary)] tabular-nums">
-              {emailsSent}
-            </p>
-            <p className="text-[11px] font-semibold text-[var(--text-secondary)] mt-0.5 uppercase tracking-wider">
-              Emails Dispatched
-            </p>
-          </div>
-        </div>
-      </div>
 
       {/* Outreach Leads Section */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider border-b border-[var(--border-subtle)] pb-2">
+      <div className="space-y-3">
+        <h2 className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider m-0">
           Prospects Ready for Outreach
         </h2>
 
@@ -152,11 +151,11 @@ export default function Outreach() {
           <EmptyState
             type="no-emails"
             title="No outreach-ready prospects yet"
-            description="Leads with extracted contact email addresses will automatically appear here for personalized outreach."
+            description="Leads with verified contact emails will appear here automatically."
             action={
               <button
                 onClick={() => navigate('/find-leads')}
-                className="bi-button inline-flex items-center gap-2 px-5 py-2.5 text-xs"
+                className="lime-button inline-flex items-center gap-2 px-5 py-2.5 text-sm"
               >
                 <Search className="w-4 h-4" />
                 Find New Leads
@@ -182,7 +181,7 @@ export default function Outreach() {
         )}
       </div>
 
-      {/* Lead Details Modal */}
+      {/* Drawers */}
       {showLeadDetails && selectedLead && (
         <LeadDetails
           lead={selectedLead}
@@ -194,7 +193,6 @@ export default function Outreach() {
         />
       )}
 
-      {/* Email Composer Modal */}
       {showEmailComposer && selectedLead && (
         <EmailComposer
           lead={selectedLead}
@@ -204,6 +202,19 @@ export default function Outreach() {
           }}
         />
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showSendAllConfirm}
+        title={`Send ${outreachLeads.length} Emails?`}
+        description="These emails will be dispatched sequentially using your connected outreach workflow. This action cannot be undone."
+        confirmLabel={`Send ${outreachLeads.length} Emails`}
+        cancelLabel="Cancel"
+        variant="success"
+        loading={isBulkSending}
+        onConfirm={handleBulkSendConfirm}
+        onCancel={() => setShowSendAllConfirm(false)}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
-const N8N_BASE_URL = 'https://deepashu.app.n8n.cloud/webhook';
+const N8N_BASE_URL = 'https://deepashu1.app.n8n.cloud/webhook';
 // For testing (requires n8n editor open with "Listen for test event"):
-// const N8N_BASE_URL = 'https://deepashu.app.n8n.cloud/webhook-test';
+// const N8N_BASE_URL = 'https://deepashu1.app.n8n.cloud/webhook-test';
 
 const N8N_API_KEY = 'e85dec84295eeb7445823c5462425156f2e182fb08e0914f4c57db11ce4f11cc';
 

@@ -41,15 +41,25 @@ export default function EmptyState({
   const Icon = CustomIcon || DefaultIcon;
 
   return (
-    <div className="bi-widget p-10 sm:p-14 text-center max-w-lg mx-auto border-dashed border-2">
-      <div className="w-12 h-12 rounded-sm bg-[var(--bg-surface-hover)] border border-[var(--border-subtle)] flex items-center justify-center mx-auto mb-4 text-[var(--text-tertiary)]">
-        <Icon className="w-6 h-6" />
+    <div className="surface p-10 sm:p-14 text-center max-w-lg mx-auto border-dashed border-2 border-[var(--border-subtle)] rounded-xl">
+      <div 
+        className="w-16 h-16 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center mx-auto mb-5 text-[var(--text-secondary)]" 
+        style={{ boxShadow: 'var(--shadow-dropdown)' }}
+      >
+        <div className="w-10 h-10 rounded-xl bg-[var(--bg-surface-hover)] flex items-center justify-center text-[var(--text-primary)]">
+          <Icon className="w-5 h-5" />
+        </div>
       </div>
-      <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1.5 tracking-tight">
+      <h3 className="text-base font-bold text-[var(--text-primary)] mb-1.5 tracking-tight">
         {title || defaultTitle}
       </h3>
       <p className="text-sm text-[var(--text-secondary)] max-w-sm mx-auto mb-6 leading-relaxed">
         {description || defaultDesc}
+        {type === 'no-leads' && (
+          <span className="block mt-2 italic text-[var(--text-tertiary)] text-[13px]">
+            e.g., "VP of Sales at software companies in New York"
+          </span>
+        )}
       </p>
       {action && <div className="flex justify-center gap-3">{action}</div>}
     </div>

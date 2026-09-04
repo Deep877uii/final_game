@@ -21,7 +21,6 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
   const { filterOptions, setFilterOptions, resetFilters, searchHistory } = useApp();
   const [showFilters, setShowFilters] = useState(false);
 
-  // Extract unique options from current leads
   const companies = useMemo(() => {
     const set = new Set<string>();
     leads.forEach((l) => {
@@ -69,7 +68,7 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
 
   return (
     <div className="space-y-3">
-      {/* Main Search & Quick Filter Bar */}
+      {/* Main Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         {/* Search Input */}
         <div className="relative flex-1">
@@ -81,47 +80,46 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
               setFilterOptions((prev) => ({ ...prev, query: e.target.value }))
             }
             placeholder="Search leads by name, role, company, or keyword..."
-            className="w-full pl-9 pr-8 py-2 text-sm bi-input"
+            className="w-full pl-9 pr-8 py-2.5 text-sm lf-input"
           />
           {filterOptions.query && (
             <button
               onClick={() =>
                 setFilterOptions((prev) => ({ ...prev, query: '' }))
               }
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-sm text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
-              aria-label="Clear search text"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-secondary)]"
+              aria-label="Clear search"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Filter Toggle Button */}
+        {/* Filter + Reset */}
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFilters((prev) => !prev)}
-            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-sm border text-sm font-semibold transition-all duration-150 ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
               activeFilterCount > 0 || showFilters
-                ? 'bg-[var(--color-primary-bg)] border-[var(--color-primary)] text-[var(--color-primary)]'
-                : 'bi-button-secondary'
+                ? 'lime-button'
+                : 'soft-button'
             }`}
           >
             <Filter className="w-4 h-4" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className="w-4 h-4 rounded-sm bg-[var(--color-primary)] text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="w-5 h-5 rounded-full bg-[var(--accent-deep)] text-white text-[10px] font-bold flex items-center justify-center">
                 {activeFilterCount}
               </span>
             )}
           </button>
 
-          {/* Reset Leads Action Button */}
           <button
             type="button"
             onClick={onResetLeadsPrompt}
-            title="Reset leads to start a fresh search"
-            className="bi-button-secondary inline-flex items-center gap-1.5 px-3 py-2 hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger)] hover:border-[var(--color-danger)] transition-colors"
+            title="Reset leads"
+            className="soft-button inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--color-danger-bg)] hover:text-[var(--color-danger)] hover:border-[var(--color-danger)]"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Reset</span>
@@ -129,88 +127,69 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
         </div>
       </div>
 
-      {/* Expanded Filter Controls */}
+      {/* Expanded Filters */}
       {showFilters && (
-        <div className="bi-widget p-4 space-y-4">
+        <div className="surface rounded-xl p-4 space-y-4 animate-fadeIn">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Company Dropdown */}
             <div>
-              <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
                 <Building2 className="w-3.5 h-3.5" />
                 Company
               </label>
               <select
                 value={filterOptions.company}
                 onChange={(e) =>
-                  setFilterOptions((prev) => ({
-                    ...prev,
-                    company: e.target.value,
-                  }))
+                  setFilterOptions((prev) => ({ ...prev, company: e.target.value }))
                 }
-                className="w-full px-3 py-1.5 text-xs bi-input"
+                className="w-full px-3 py-2 text-xs lf-input"
               >
                 <option value="">All Companies</option>
                 {companies.map((comp) => (
-                  <option key={comp} value={comp}>
-                    {comp}
-                  </option>
+                  <option key={comp} value={comp}>{comp}</option>
                 ))}
               </select>
             </div>
 
-            {/* Location Dropdown */}
             <div>
-              <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
                 <MapPin className="w-3.5 h-3.5" />
                 Location
               </label>
               <select
                 value={filterOptions.location}
                 onChange={(e) =>
-                  setFilterOptions((prev) => ({
-                    ...prev,
-                    location: e.target.value,
-                  }))
+                  setFilterOptions((prev) => ({ ...prev, location: e.target.value }))
                 }
-                className="w-full px-3 py-1.5 text-xs bi-input"
+                className="w-full px-3 py-2 text-xs lf-input"
               >
                 <option value="">All Locations</option>
                 {locations.map((loc) => (
-                  <option key={loc} value={loc}>
-                    {loc}
-                  </option>
+                  <option key={loc} value={loc}>{loc}</option>
                 ))}
               </select>
             </div>
 
-            {/* Source Dropdown */}
             <div>
-              <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+              <label className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
                 <Sparkles className="w-3.5 h-3.5" />
                 Source
               </label>
               <select
                 value={filterOptions.source}
                 onChange={(e) =>
-                  setFilterOptions((prev) => ({
-                    ...prev,
-                    source: e.target.value,
-                  }))
+                  setFilterOptions((prev) => ({ ...prev, source: e.target.value }))
                 }
-                className="w-full px-3 py-1.5 text-xs bi-input"
+                className="w-full px-3 py-2 text-xs lf-input"
               >
                 <option value="">All Sources</option>
                 {sources.map((src) => (
-                  <option key={src} value={src}>
-                    {src}
-                  </option>
+                  <option key={src} value={src}>{src}</option>
                 ))}
               </select>
             </div>
 
-            {/* Status Filter */}
             <div>
-              <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+              <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-2 block">
                 Status
               </label>
               <select
@@ -221,10 +200,10 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
                     status: e.target.value as FilterOptions['status'],
                   }))
                 }
-                className="w-full px-3 py-1.5 text-xs bi-input"
+                className="w-full px-3 py-2 text-xs lf-input"
               >
                 <option value="all">All Statuses</option>
-                <option value="hasEmail">Has Email Address</option>
+                <option value="hasEmail">Has Email</option>
                 <option value="noEmail">Missing Email</option>
                 <option value="generated">Email Generated</option>
                 <option value="sent">Email Sent</option>
@@ -240,7 +219,7 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
               <button
                 type="button"
                 onClick={resetFilters}
-                className="text-xs font-medium text-[var(--color-primary)] hover:underline"
+                className="text-xs font-bold text-[var(--accent-mid)] hover:underline"
               >
                 Clear all filters
               </button>
@@ -249,12 +228,12 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
         </div>
       )}
 
-      {/* Previous Searches Quick Chips */}
+      {/* Search History Chips */}
       {searchHistory.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs text-[var(--text-secondary)]">
           <div className="flex items-center gap-1 text-[var(--text-primary)] flex-shrink-0">
             <History className="w-3.5 h-3.5" />
-            <span className="font-medium">Recent:</span>
+            <span className="font-semibold">Recent:</span>
           </div>
           <div className="flex items-center gap-1.5 flex-nowrap">
             {searchHistory.slice(0, 5).map((item, idx) => (
@@ -262,7 +241,7 @@ export default function FilterBar({ leads, onResetLeadsPrompt }: FilterBarProps)
                 key={idx}
                 type="button"
                 onClick={() => applyPreviousSearch(item)}
-                className="px-2 py-1 rounded-sm bg-[var(--bg-surface)] border border-[var(--border-strong)] hover:border-[var(--color-primary)] text-[var(--text-secondary)] hover:text-[var(--color-primary)] transition-colors whitespace-nowrap"
+                className="soft-button px-2.5 py-1 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent-mid)] hover:border-[var(--accent-soft)] whitespace-nowrap text-xs"
               >
                 {item.searchQuery || 'All'} · {item.location || 'Anywhere'}
               </button>
